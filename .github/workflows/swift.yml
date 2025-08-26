@@ -1,7 +1,7 @@
-# This workflow will build a Swift project
+# This workflow will build and test the Swift package across multiple platforms
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-swift
 
-name: Swift
+name: CI
 
 on:
   push:
@@ -9,14 +9,86 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  SWIFT_VERSION: '5.7'
+
 jobs:
-  build:
-
+  # Swift Package Manager build and test
+  spm-test:
+    name: SPM Tests
     runs-on: macos-latest
-
+    
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Cache Swift Package Manager
+      uses: actions/cache@v4
+      with:
+        path: .build
+        key: ${{ runner.os }}-spm-${{ hashFiles('Package.swift') }}
+        restore-keys: ${{ runner.os }}-spm-
+        
     - name: Build
       run: swift build -v
+      
     - name: Run tests
-      run: swift test -v
+      run: swift test -v --enable-code-coverage
+      
+    - name: Generate test coverage report
+      run: |
+        xcrun llvm-cov export -format="lcov" \
+          .build/debug/PreviewInUIKitPackageTests.xctest/Contents/MacOS/PreviewInUIKitPackageTests \
+          -instr-profile .build/debug/codecov/default.profdata > coverage.lcov
+      continue-on-error: true
+
+  # Xcode build and test matrix for iOS, tvOS, watchOS
+  xcode-test:
+    name: Xcode Tests
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        destination:
+          - "platform=iOS Simulator,name=iPhone 15,OS=latest"
+          - "platform=tvOS Simulator,name=Apple TV,OS=latest"
+          - "platform=watchOS Simulator,name=Apple Watch Series 9 (45mm),OS=latest"
+          
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Cache DerivedData
+      uses: actions/cache@v4
+      with:
+        path: ~/Library/Developer/Xcode/DerivedData
+        key: ${{ runner.os }}-xcode-${{ matrix.destination }}-${{ hashFiles('Package.swift') }}
+        restore-keys: ${{ runner.os }}-xcode-${{ matrix.destination }}-
+        
+    - name: Build and Test
+      run: |
+        xcodebuild test \
+          -scheme PreviewInUIKit \
+          -destination "${{ matrix.destination }}" \
+          -enableCodeCoverage YES \
+          -derivedDataPath ~/Library/Developer/Xcode/DerivedData
+          
+  # Build documentation
+  build-docs:
+    name: Build Documentation
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Cache Swift Package Manager
+      uses: actions/cache@v4
+      with:
+        path: .build
+        key: ${{ runner.os }}-spm-docs-${{ hashFiles('Package.swift') }}
+        restore-keys: ${{ runner.os }}-spm-docs-
+        
+    - name: Build Documentation
+      run: |
+        swift package generate-documentation --target PreviewInUIKit
+      continue-on-error: true

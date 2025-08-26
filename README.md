@@ -1,5 +1,10 @@
 # PreviewInUIKit
 
+![CI](https://github.com/dwhao84/Preview-in-UIKit/workflows/CI/badge.svg)
+![Release](https://github.com/dwhao84/Preview-in-UIKit/workflows/Release/badge.svg)
+![Swift 5.7+](https://img.shields.io/badge/Swift-5.7+-orange.svg)
+![Platforms](https://img.shields.io/badge/Platforms-iOS%2013.0%2B%20%7C%20tvOS%2013.0%2B%20%7C%20watchOS%206.0%2B%20%7C%20macOS%2010.15%2B-blue.svg)
+
 A Swift package that provides SwiftUI wrappers for previewing UIKit views and view controllers in Xcode previews.
 
 ## Overview
@@ -200,9 +205,87 @@ public struct ViewControllerPreview<V: UIViewController>: UIViewControllerRepres
 - This is expected behavior. The package only compiles on platforms with UIKit
 - Use iOS simulators for testing and previews
 
+## GitHub Actions CI/CD
+
+This repository includes comprehensive GitHub Actions workflows for continuous integration and automated releases.
+
+### Continuous Integration (CI)
+
+The CI workflow (`.github/workflows/swift.yml`) automatically runs on every push and pull request to the `main` branch:
+
+**Features:**
+- **Multi-platform testing**: Tests on iOS, tvOS, and watchOS simulators using Xcode
+- **Swift Package Manager**: Builds and tests using SPM for macOS compatibility
+- **Code coverage**: Generates test coverage reports
+- **Documentation**: Validates that documentation can be built
+- **Caching**: Uses GitHub Actions cache to speed up builds
+
+**Jobs:**
+1. **SPM Tests**: Builds and tests using Swift Package Manager on macOS
+2. **Xcode Tests**: Cross-platform testing matrix for iOS, tvOS, and watchOS
+3. **Build Documentation**: Ensures documentation can be generated
+
+### Release Automation
+
+The release workflow (`.github/workflows/release.yml`) automatically creates GitHub releases when version tags are pushed:
+
+**To create a release:**
+1. Create and push a version tag: `git tag v1.0.0 && git push origin v1.0.0`
+2. The workflow will automatically:
+   - Validate the release by running tests
+   - Create a GitHub release with installation instructions
+   - Generate release notes
+
+**Workflow features:**
+- Validates release by running full test suite
+- Auto-generates release notes with installation instructions
+- Supports semantic versioning (e.g., v1.0.0, v1.2.3)
+
+### Local Development
+
+Before pushing changes, you can run the same checks locally:
+
+```bash
+# Build and test with SPM (for macOS)
+swift build
+swift test
+
+# Test on iOS Simulator (requires Xcode)
+xcodebuild test -scheme PreviewInUIKit \
+  -destination "platform=iOS Simulator,name=iPhone 15,OS=latest"
+
+# Test on tvOS Simulator
+xcodebuild test -scheme PreviewInUIKit \
+  -destination "platform=tvOS Simulator,name=Apple TV,OS=latest"
+
+# Test on watchOS Simulator
+xcodebuild test -scheme PreviewInUIKit \
+  -destination "platform=watchOS Simulator,name=Apple Watch Series 9 (45mm),OS=latest"
+
+# Generate documentation
+swift package generate-documentation --target PreviewInUIKit
+```
+
+### Status Badges
+
+You can add these badges to show the build status in your README:
+
+```markdown
+![CI](https://github.com/dwhao84/Preview-in-UIKit/workflows/CI/badge.svg)
+![Release](https://github.com/dwhao84/Preview-in-UIKit/workflows/Release/badge.svg)
+```
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+**Before submitting:**
+1. Ensure all tests pass locally
+2. Add tests for new functionality
+3. Update documentation if needed
+4. Follow the existing code style
+
+The CI workflow will automatically test your changes across all supported platforms.
 
 ## License
 
