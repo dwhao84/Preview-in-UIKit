@@ -5,6 +5,7 @@ import SwiftUI
 @available(
     iOS 13.0,
     tvOS 13.0,
+    watchOS 6.0,
     *
 )
 public struct UIViewPreview<V: UIView>: UIViewRepresentable {
@@ -30,6 +31,7 @@ public struct UIViewPreview<V: UIView>: UIViewRepresentable {
 @available(
     iOS 13.0,
     tvOS 13.0,
+    watchOS 6.0,
     *
 )
 public struct ViewControllerPreview<V: UIViewController>: UIViewControllerRepresentable {
