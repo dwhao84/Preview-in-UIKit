@@ -11,9 +11,8 @@ PreviewInUIKit makes it easy to preview your UIKit components using SwiftUI's pr
 - **UIViewPreview**: Wrap any `UIView` for SwiftUI previews
 - **ViewControllerPreview**: Wrap any `UIViewController` for SwiftUI previews
 - Compatible with iOS 13.0+, tvOS 13.0+, and watchOS 6.0+
-- Works seamlessly with macOS Xcode for development and previews
-- Lightweight and easy to integrate
 - Type-safe generic interfaces
+- Proper conditional compilation for platform availability
 
 ## Requirements
 
@@ -21,7 +20,7 @@ PreviewInUIKit makes it easy to preview your UIKit components using SwiftUI's pr
 - Xcode 12.0+
 - Swift 5.7+
 
-> **Note**: This package uses UIKit APIs and is designed for previewing UIKit components. It will only be available on platforms that support UIKit (iOS, tvOS, and watchOS). macOS support is included for Xcode development and previews.
+> **Note**: This package uses UIKit APIs and is designed for previewing UIKit components. It is only available on platforms that support UIKit (iOS, tvOS, and watchOS). For development and previews, use Xcode with iOS simulators.
 
 ## Installation
 
@@ -197,8 +196,8 @@ public struct ViewControllerPreview<V: UIViewController>: UIViewControllerRepres
 - Check that your UIView/UIViewController classes are properly initialized
 
 **Build errors on macOS:**
-- This is expected behavior. The package only compiles on platforms with UIKit
-- Use iOS simulators for testing and previews
+- This is expected behavior when trying to build for macOS targets. The package only supports iOS, tvOS, and watchOS platforms where UIKit is available
+- Use iOS simulators for testing and previews in Xcode
 
 ## Contributing
 
